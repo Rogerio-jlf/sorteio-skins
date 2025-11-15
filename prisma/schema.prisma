@@ -1,0 +1,195 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// TABELAS DO BETTER AUTH
+// ============================================
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+
+  // Relações do sistema de sorteios
+  deposits      Deposit[]
+  entries       RaffleEntry[]
+  sessions      Session[]
+  accounts      Account[]
+  
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id           String  @id
+  accountId    String
+  providerId   String
+  userId       String
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken  String?
+  refreshToken String?
+  idToken      String?
+  accessTokenExpiresAt DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope        String?
+  password     String?
+  createdAt    DateTime
+  updatedAt    DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime
+  updatedAt  DateTime
+
+  @@map("verification")
+}
+
+// ============================================
+// TABELAS DO SISTEMA DE SORTEIOS
+// ============================================
+
+// Patrocinadores/Sites parceiros
+model Sponsor {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  couponCode  String   @unique
+  logoUrl     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  deposits    Deposit[]
+  raffles     Raffle[]
+  
+  @@map("sponsor")
+}
+
+// Sorteios
+model Raffle {
+  id          String   @id @default(cuid())
+  sponsorId   String
+  sponsor     Sponsor  @relation(fields: [sponsorId], references: [id])
+  
+  title       String
+  description String?
+  skinName    String
+  skinImage   String?
+  skinValue   Float
+  
+  startDate   DateTime
+  endDate     DateTime
+  drawDate    DateTime?
+  
+  status      RaffleStatus @default(ACTIVE)
+  winnerId    String?
+  winnerNumber Int?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  entries     RaffleEntry[]
+  deposits    Deposit[]
+  
+  @@index([sponsorId])
+  @@index([status])
+  @@map("raffle")
+}
+
+enum RaffleStatus {
+  ACTIVE
+  DRAWING
+  COMPLETED
+  CANCELLED
+}
+
+// Depósitos dos usuários
+model Deposit {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  sponsorId   String
+  sponsor     Sponsor  @relation(fields: [sponsorId], references: [id])
+  
+  raffleId    String
+  raffle      Raffle   @relation(fields: [raffleId], references: [id])
+  
+  amount      Float
+  quotas      Int
+  proofImage  String   // URL da imagem do comprovante
+  
+  status      DepositStatus @default(PENDING)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  entries     RaffleEntry[]
+  
+  @@index([userId])
+  @@index([sponsorId])
+  @@index([raffleId])
+  @@index([status])
+  @@map("deposit")
+}
+
+enum DepositStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Participações no sorteio (cada quota gera uma entry)
+model RaffleEntry {
+  id          String   @id @default(cuid())
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  raffleId    String
+  raffle      Raffle   @relation(fields: [raffleId], references: [id])
+  
+  depositId   String
+  deposit     Deposit  @relation(fields: [depositId], references: [id])
+  
+  ticketNumber Int     // Número da sorte gerado aleatoriamente
+  
+  createdAt   DateTime @default(now())
+  
+  @@unique([raffleId, ticketNumber])
+  @@index([userId])
+  @@index([raffleId])
+  @@index([depositId])
+  @@map("raffle_entry")
+}
