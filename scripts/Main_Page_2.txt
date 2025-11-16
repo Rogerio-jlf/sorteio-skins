@@ -18,31 +18,12 @@ import {
   Shield,
   Heart,
 } from "lucide-react";
-import { LoginForm } from "./Sign_In_Form";
-import { SignUpForm } from "./Sign_Up_Form";
-import Image from "next/image";
 
 export default function MainPage() {
   const [copiedCode, setCopiedCode] = useState<string>("");
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
-  const [isLoginFormOpen, setIsLoginFormOpen] = useState(false);
-  const [isSignUpFormOpen, setIsSignUpFormOpen] = useState(false);
+  const [onlineUsers] = useState<number>(3247);
 
-  // Função para abrir formulário de login
-  const handleToDoLogin = () => {
-    setIsSignUpFormOpen(false);
-    setIsLoginFormOpen(true);
-  };
-  // ==========
-
-  // Função para abrir formulário de cadastro
-  const handleToDoSignUp = () => {
-    setIsLoginFormOpen(false);
-    setIsSignUpFormOpen(true);
-  };
-  // ==========
-
-  // Arrays de patrocinadores
   const sponsors = [
     {
       name: "CSGo.net",
@@ -61,73 +42,64 @@ export default function MainPage() {
       color: "from-purple-600 via-pink-600 to-red-600",
     },
   ];
-  // ==========
 
-  // Arrays de sorteios ativos
   const activeRaffles = [
     {
       id: 1,
       name: "AK-47 | Redline",
-      value: "R$ 45,00",
+      value: "$45.00",
       participants: 1247,
       endTime: Date.now() + 3600000 * 24,
       rarity: "Classified",
-      // color: "from-purple-500 to-pink-500",
-      image: "/facas-1.webp",
+      color: "from-purple-500 to-pink-500",
     },
     {
       id: 2,
       name: "AWP | Dragon Lore",
-      value: "R$ 2.150,00",
+      value: "$2,150.00",
       participants: 3891,
       endTime: Date.now() + 3600000 * 48,
       rarity: "Covert",
-      // color: "from-red-500 to-orange-500",
-      image: "/facas-2.webp",
+      color: "from-red-500 to-orange-500",
     },
     {
       id: 3,
       name: "Karambit | Fade",
-      value: "R$ 850,00",
+      value: "$850.00",
       participants: 2456,
       endTime: Date.now() + 3600000 * 12,
       rarity: "Covert",
-      // color: "from-yellow-500 to-orange-500",
-      image: "/facas-3.webp",
+      color: "from-yellow-500 to-orange-500",
     },
   ];
-  // ==========
 
-  // Arrays de vencedores recentes
   const recentWinners = [
     {
       name: "Player***123",
       skin: "M4A4 | Howl",
       date: "Há 2 horas",
-      value: "R$1.200",
+      value: "$1,200",
     },
     {
       name: "CS***Pro",
       skin: "Butterfly Knife",
       date: "Há 5 horas",
-      value: "R$950",
+      value: "$950",
     },
     {
       name: "Gamer***XD",
       skin: "AK-47 | Fire Serpent",
       date: "Há 8 horas",
-      value: "R$780",
+      value: "$780",
     },
     {
       name: "Skin***Hunter",
       skin: "Glock-18 | Fade",
       date: "Há 1 dia",
-      value: "R$420",
+      value: "$420",
     },
   ];
-  // ==========
 
-  // Arrays de perguntas frequentes
   const faqs = [
     {
       question: "Como participar dos sorteios?",
@@ -155,9 +127,7 @@ export default function MainPage() {
         "Absolutamente! Usamos um sistema de seleção aleatória verificável. Todos os sorteios são transparentes e auditáveis.",
     },
   ];
-  // ==========
 
-  // Arrays de depoimentos
   const testimonials = [
     {
       name: "João Silva",
@@ -175,9 +145,7 @@ export default function MainPage() {
       rating: 5,
     },
   ];
-  // ==========
 
-  // Arrays de como funciona
   const howItWorks = [
     {
       step: 1,
@@ -204,26 +172,20 @@ export default function MainPage() {
       icon: Trophy,
     },
   ];
-  // ==========
 
-  // Arrays de próximos sorteios
   const upcomingRaffles = [
     { date: "16 Nov", skin: "Karambit | Tiger Tooth", value: "$650" },
     { date: "17 Nov", skin: "M4A1-S | Hyper Beast", value: "$85" },
     { date: "18 Nov", skin: "USP-S | Kill Confirmed", value: "$120" },
     { date: "19 Nov", skin: "Glock-18 | Water Elemental", value: "$25" },
   ];
-  // ==========
 
-  // Função para copiar cupom
   const copyCoupon = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(""), 2000);
   };
-  // ==========
 
-  // Componente de contagem regressiva
   const CountdownTimer = ({ endTime }: { endTime: number }) => {
     const [timeLeft, setTimeLeft] = useState<string>("");
 
@@ -249,220 +211,179 @@ export default function MainPage() {
 
     return <span>{timeLeft}</span>;
   };
-  // ==========
 
-  // ====================================================================================================
-  // Renderização do Componente
-  // ====================================================================================================
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-950 via-gray-900 to-black text-white overflow-x-hidden">
-      {/* Modal de Login */}
-      <LoginForm
-        isOpenLoginForm={isLoginFormOpen}
-        onCloseLoginForm={() => setIsLoginFormOpen(false)}
-        onRegisterNow={handleToDoSignUp}
-      />
-      {/* ===== */}
-
-      {/* Modal de Cadastro */}
-      <SignUpForm
-        isOpenSinUpForm={isSignUpFormOpen}
-        onCloseSingUpForm={() => setIsSignUpFormOpen(false)}
-        onToDoLogin={handleToDoLogin}
-      />
-      {/* ===== */}
-
       {/* Header */}
-      <header className="shadow-slate-400 shadow-md bg-black backdrop-blur-md sticky top-0 z-50">
-        <div className="w-[1500px] mx-auto py-4 flex items-center justify-between">
+      <header className="border-b border-gray-800 bg-black/50 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="relative w-20 h-20 bg-linear-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center shadow-lg shadow-orange-500/20">
-              <Image
-                src="/taruh-1.avif"
-                alt="Logo Taruh"
-                width={60}
-                height={60}
-                className="w-18 h-18 rounded-full"
-              />
+            <div className="w-12 h-12 bg-linear-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
+              <Trophy className="w-7 h-7 text-white" />
             </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <h1 className="text-4xl font-extrabold bg-linear-to-r from-yellow-400 via-orange-500 to-red-600 bg-clip-text text-transparent tracking-tighter select-none">
-                  TARUH
-                </h1>
-                <span className="px-2 py-0.5 bg-yellow-500/20 border border-yellow-500/50 rounded-md text-yellow-400 text-xs font-semibold tracking-widest select-none italic animate-pulse">
-                  PRO
-                </span>
-              </div>
-              <span className="text-base text-slate-300 font-semibold tracking-widest select-none italic">
+            <div>
+              <h1 className="text-2xl font-black bg-linear-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
                 Skin Raffle
+              </h1>
+              <span className="text-xs text-gray-500 font-semibold">
+                By Taruh
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => setIsLoginFormOpen(true)}
-              className="px-6 py-2 bg-linear-to-r from-yellow-400 via-orange-500 to-red-600 rounded-md font-extrabold shadow-slate-400 shadow-sm text-xl hover:shadow-lg active:scale-95 hover:shadow-slate-400 transition-all hover:scale-110 text-black tracking-widest select-none"
-            >
+            <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gray-800/50 rounded-lg">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-sm text-gray-400">
+                {onlineUsers} online
+              </span>
+            </div>
+            <button className="px-6 py-2.5 bg-linear-to-r from-yellow-500 to-orange-600 rounded-xl font-bold text-sm hover:shadow-2xl hover:shadow-orange-500/50 transition-all hover:scale-105">
               Entrar
             </button>
           </div>
         </div>
       </header>
-      {/* ===== */}
 
-      {/* Seção Hero */}
-      <section className="w-[1500px] mx-auto py-20 text-center relative flex flex-col items-center justify-center">
-        <div className="flex items-center justify-center gap-2 mb-8">
+      {/* Hero Section */}
+      <section className="max-w-7xl mx-auto px-6 py-20 text-center relative">
+        <div className="flex items-center justify-center gap-2 mb-6">
           <Sparkles className="w-7 h-7 text-yellow-400 animate-pulse" />
-          <span className="text-yellow-400 font-extrabold uppercase text-lg tracking-widest select-none">
+          <span className="text-yellow-400 font-bold uppercase text-base tracking-wider">
             Sorteios Exclusivos
           </span>
           <Sparkles className="w-7 h-7 text-yellow-400 animate-pulse" />
         </div>
 
-        <h2 className="text-7xl font-extrabold select-none tracking-widest text-white mb-4">
+        <h2 className="text-6xl md:text-7xl font-black mb-8 leading-tight">
           Ganhe Skins
-          <span className="block bg-linear-to-r from-yellow-400 via-orange-500 to-red-600 bg-clip-text text-transparent leading-tight">
-            Incríveis para o seu jogo
+          <span className="block bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 bg-clip-text text-transparent">
+            Incríveis de CS2
           </span>
         </h2>
 
-        <p className="text-xl text-slate-400 max-w-4xl mx-auto tracking-wider italic select-none font-semibold">
-          Participe dos nossos sorteios exclusivos e concorra a skins raras. Use
-          os cupons dos nossos{" "}
-          <span className="bg-linear-to-r from-cyan-400 via-blue-500 to-cyan-600 bg-clip-text text-transparent text-3xl select-none font-extrabold tracking-widest">
-            Patrocinadores
-          </span>{" "}
-          para ter ainda mais chances de ganhar!
+        <p className="text-xl text-gray-400 mb-10 max-w-3xl mx-auto">
+          Participe dos nossos sorteios exclusivos e concorra a skins raras de
+          CS2. Use os cupons dos nossos patrocinadores para ter ainda mais
+          chances de ganhar!
         </p>
-      </section>
-      {/* ===== */}
 
-      {/* Sorteios Ativos */}
-      <section className="w-[1500px] mx-auto flex flex-col gap-12">
-        <div className="text-center flex flex-col gap-2">
-          <h3 className="text-5xl font-extrabold tracking-widest select-none text-white">
+        <div className="flex gap-5 justify-center flex-wrap">
+          <button className="px-10 py-5 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-xl font-bold text-xl hover:shadow-2xl hover:shadow-orange-500/50 transition-all flex items-center gap-3 hover:scale-105">
+            <Gift className="w-6 h-6" />
+            Ver Sorteios
+          </button>
+          <button className="px-10 py-5 bg-gray-800 hover:bg-gray-700 rounded-xl font-bold text-xl transition-all hover:scale-105 border border-gray-700">
+            Como Funciona
+          </button>
+        </div>
+      </section>
+
+      {/* Active Raffles */}
+      <section className="max-w-7xl mx-auto px-6 py-20">
+        <div className="text-center mb-12">
+          <h3 className="text-4xl md:text-5xl font-black mb-4">
             Sorteios Ativos Agora
           </h3>
-          <p className="text-amber-400 text-xl select-none tracking-widest font-semibold italic">
+          <p className="text-gray-400 text-lg">
             Participe antes que acabe o tempo!
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           {activeRaffles.map((raffle) => (
             <div
               key={raffle.id}
-              className="bg-black rounded-2xl overflow-hidden shadow-slate-400 shadow-md hover:shadow-slate-400 hover:shadow-xl transition-all border-t border-slate-700"
+              className="bg-linear-to-br from-gray-900 to-black rounded-2xl overflow-hidden border border-gray-800 hover:border-gray-600 transition-all hover:shadow-2xl"
             >
-              <div className="relative h-58">
-                <Image
-                  src={raffle.image}
-                  alt={raffle.name}
-                  width={400}
-                  height={192}
-                  className="w-full h-full object-cover"
-                />
-
-                <div className="absolute inset-0 bg-linear-to-br opacity-20"></div>
-                <div className="absolute top-4 right-5">
-                  <span className="px-4 py-1.5 bg-black rounded-full text-xs font-bold text-yellow-400 tracking-widest select-none italic animate-pulse shadow-xs shadow-slate-400">
+              <div className="relative h-48 bg-gray-800">
+                <div
+                  className={`absolute inset-0 bg-linear-to-br ${raffle.color} opacity-20`}
+                ></div>
+                <div className="absolute top-4 right-4">
+                  <span className="px-3 py-1 bg-black/80 rounded-full text-xs font-bold text-yellow-400">
                     {raffle.rarity}
                   </span>
                 </div>
               </div>
 
-              <div className="flex flex-col p-6 gap-8">
-                <div className="flex flex-col">
-                  <h4 className="text-2xl font-extrabold tracking-widest select-none text-white">
-                    {raffle.name}
-                  </h4>
-                  <p className="text-3xl font-extrabold tracking-widest select-none italic text-yellow-400">
-                    {raffle.value}
-                  </p>
-                </div>
+              <div className="p-6">
+                <h4 className="text-2xl font-black mb-2">{raffle.name}</h4>
+                <p className="text-3xl font-black text-yellow-400 mb-4">
+                  {raffle.value}
+                </p>
 
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-white font-semibold select-none tracking-widest flex items-center gap-3">
-                      <Users className="w-5 h-5" />
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-400 flex items-center gap-2">
+                      <Users className="w-4 h-4" />
                       Participantes
                     </span>
-                    <span className="text-white font-semibold select-none tracking-widest text-xl italic">
+                    <span className="font-bold">
                       {raffle.participants.toLocaleString()}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <span className="text-white font-semibold select-none tracking-widest flex items-center gap-3">
-                      <Clock className="w-5 h-5" />
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-400 flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
                       Termina em
                     </span>
-                    <span className="text-orange-400 font-semibold select-none tracking-widest text-xl italic">
+                    <span className="font-bold text-orange-400">
                       <CountdownTimer endTime={raffle.endTime} />
                     </span>
                   </div>
                 </div>
 
-                <div className="flex justify-center">
-                  <button className=" py-2 px-6 bg-linear-to-r text-xl rounded-md text-white transition-all hover:scale-110 hover:bg-cyan-500 cursor-pointer active:scale-95 tracking-widest font-extrabold hover:text-black">
-                    Participar
-                  </button>
-                </div>
+                <button
+                  className={`w-full py-4 bg-linear-to-r ${raffle.color} rounded-xl font-bold hover:shadow-xl transition-all hover:scale-105`}
+                >
+                  Participar Grátis
+                </button>
               </div>
             </div>
           ))}
         </div>
       </section>
-      {/* ===== */}
 
-      {/* Vencedores Recentes */}
-      <section className="w-[1500px] mx-auto py-20 rounded-2xl">
-        <div className="text-center">
-          <h3 className="text-5xl font-extrabold tracking-widest select-none text-white">
+      {/* Recent Winners */}
+      <section className="max-w-7xl mx-auto px-6 py-20 bg-linear-to-r from-yellow-500/5 to-orange-500/5 rounded-3xl">
+        <div className="text-center mb-12">
+          <h3 className="text-4xl md:text-5xl font-black mb-4">
             Vencedores Recentes
           </h3>
-          <p className="text-emerald-400 text-xl tracking-widest font-semibold italic select-none">
+          <p className="text-gray-400 text-lg">
             Pessoas reais ganhando skins reais!
           </p>
         </div>
 
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {recentWinners.map((winner, index) => (
             <div
               key={index}
-              className="bg-slate-800 rounded-2xl p-6 border-t border-emerald-900 shadow-md shadow-emerald-400 flex flex-col gap-8"
+              className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800 hover:border-green-500/50 transition-all"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-linear-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center shadow-md shadow-emerald-400/30">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-linear-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
                   <Trophy className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="font-extrabold text-base tracking-widest select-none text-white">
-                    {winner.name}
-                  </p>
-                  <p className="text-sm text-slate-400 tracking-widest select-none italic font-semibold">
-                    {winner.date}
-                  </p>
+                  <p className="font-bold text-sm">{winner.name}</p>
+                  <p className="text-xs text-gray-500">{winner.date}</p>
                 </div>
               </div>
-              <div className="flex flex-col">
-                <p className="text-xl font-extrabold tracking-widest select-none text-amber-400">
-                  {winner.skin}
-                </p>
-                <p className="text-2xl font-black tracking-widest select-none text-green-500">
-                  {winner.value}
-                </p>
-              </div>
+              <p className="text-lg font-bold text-yellow-400 mb-1">
+                {winner.skin}
+              </p>
+              <p className="text-2xl font-black text-green-400">
+                {winner.value}
+              </p>
             </div>
           ))}
         </div>
       </section>
-      {/* ===== */}
 
-      {/* Como Funciona */}
+      {/* How It Works */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center mb-12">
           <h3 className="text-4xl md:text-5xl font-black mb-4">
@@ -491,9 +412,8 @@ export default function MainPage() {
           ))}
         </div>
       </section>
-      {/* ===== */}
 
-      {/* Próximos Sorteios */}
+      {/* Upcoming Raffles Calendar */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center mb-12">
           <h3 className="text-4xl md:text-5xl font-black mb-4">
@@ -522,9 +442,8 @@ export default function MainPage() {
           ))}
         </div>
       </section>
-      {/* ===== */}
 
-      {/* Patrocinadores */}
+      {/* Sponsors Section */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center mb-12">
           <h3 className="text-4xl md:text-5xl font-black mb-4">
@@ -590,9 +509,8 @@ export default function MainPage() {
           ))}
         </div>
       </section>
-      {/* ===== */}
 
-      {/* O Que Dizem Nossos Usuários */}
+      {/* Testimonials */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center mb-12">
           <h3 className="text-4xl md:text-5xl font-black mb-4">
@@ -625,9 +543,8 @@ export default function MainPage() {
           ))}
         </div>
       </section>
-      {/* ===== */}
 
-      {/* Perguntas Frequentes */}
+      {/* FAQ */}
       <section className="max-w-4xl mx-auto px-6 py-20">
         <div className="text-center mb-12">
           <h3 className="text-4xl md:text-5xl font-black mb-4">
@@ -664,9 +581,8 @@ export default function MainPage() {
           ))}
         </div>
       </section>
-      {/* ===== */}
 
-      {/* Estatísticas */}
+      {/* Stats Section */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <div className="grid md:grid-cols-3 gap-8">
           <div className="bg-linear-to-br from-gray-900 to-black rounded-2xl p-8 text-center border border-gray-800 hover:border-yellow-500/50 transition-all">
@@ -685,7 +601,6 @@ export default function MainPage() {
           </div>
         </div>
       </section>
-      {/* ===== */}
 
       {/* Trust Badges */}
       <section className="max-w-7xl mx-auto px-6 py-20">
@@ -712,7 +627,6 @@ export default function MainPage() {
           </div>
         </div>
       </section>
-      {/* ===== */}
 
       {/* CTA Final */}
       <section className="max-w-7xl mx-auto px-6 py-20">
@@ -728,7 +642,6 @@ export default function MainPage() {
           </button>
         </div>
       </section>
-      {/* ===== */}
 
       {/* Footer */}
       <footer className="border-t border-gray-800 bg-black/50 mt-20">
@@ -821,7 +734,6 @@ export default function MainPage() {
           </div>
         </div>
       </footer>
-      {/* ===== */}
     </div>
   );
 }

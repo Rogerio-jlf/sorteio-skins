@@ -1,25 +1,29 @@
-// ============================================
 // src/app/api/deposits/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../lib/prisma";
 
-// GET /api/deposits/[id] - Busca depósito específico
+// GET /api/deposits/[id] - Busca depósito por ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> } // 👈 Promise
 ) {
+  // ✅ DESEMPACOTAR PARAMS
+  const { id } = await params;
+
   try {
     const deposit = await prisma.deposit.findUnique({
-      where: { id: params.id },
+      where: { id }, // 👈 Agora funciona
       include: {
-        sponsor: true,
-        raffle: true,
-        user: true,
-        entries: {
+        user: {
           select: {
-            ticketNumber: true,
+            id: true,
+            name: true,
+            email: true,
           },
         },
+        sponsor: true,
+        raffle: true,
+        entries: true,
       },
     });
 

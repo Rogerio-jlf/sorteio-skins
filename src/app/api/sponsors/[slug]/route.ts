@@ -1,4 +1,3 @@
-// ============================================
 // src/app/api/sponsors/[slug]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../lib/prisma";
@@ -6,11 +5,20 @@ import prisma from "../../../../lib/prisma";
 // GET /api/sponsors/[slug] - Busca patrocinador por slug
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> } // 👈 Promise
 ) {
+  // ✅ DESEMPACOTAR PARAMS
+  const { slug } = await params;
+
   try {
     const sponsor = await prisma.sponsor.findUnique({
-      where: { slug: params.slug },
+      where: { slug }, // 👈 Agora funciona
+      include: {
+        raffles: {
+          where: { status: "ACTIVE" },
+          orderBy: { createdAt: "desc" },
+        },
+      },
     });
 
     if (!sponsor) {

@@ -1,0 +1,172 @@
+### ============================================
+### CONFIGURAÇÃO
+### ============================================
+@baseUrl = http://localhost:3000
+@contentType = application/json
+@userId = Bnr6l93HzkTpwXlb2xAhAe2N1h29jWgD
+@sessionToken = P9WM5FssjgIRLSlSCLJqjbNEVfkgjdGH.UZcaFs3odwMUeXcIZhirbQasPeFmygo%2Bqjk8x60j6VY%3D
+
+### ============================================
+### TESTE DE AUTENTICAÇÃO
+### ============================================
+
+### GET - Verificar usuário logado e role - OK
+GET {{baseUrl}}/api/auth/me
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+### ========================================================================================
+
+
+
+
+
+### ============================================
+### PASSO 1: CRIAR PATROCINADOR
+### ============================================
+
+### POST - Criar patrocinador -OK
+POST {{baseUrl}}/api/sponsors
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+
+{
+  "name": "GG.Bet",
+  "slug": "ggbet",
+  "couponCode": "PROMO2025",
+  "logoUrl": "https://via.placeholder.com/150",
+  "isActive": true
+}
+###
+
+# Após executar o POST, copie o "id" da resposta e cole abaixo:
+@sponsorId = cmi0h91gk0000759gfm2jfxt4
+
+### GET - Listar todos os patrocinadores - OK
+GET {{baseUrl}}/api/sponsors
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+###
+
+### GET - Buscar patrocinador específico pelo slug - OK
+GET {{baseUrl}}/api/sponsors/ggbet
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+###
+### ========================================================================================
+
+
+
+
+
+### ============================================
+### PASSO 2: CRIAR SORTEIO
+### ============================================
+
+### POST - Criar sorteio - OK
+POST {{baseUrl}}/api/raffles
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+
+{
+  "sponsorId": "{{sponsorId}}",
+  "title": "Sorteio AK-47 Redline",
+  "description": "Concorra a uma AK-47 Redline Field-Tested",
+  "skinName": "AK-47 Redline Field-Tested",
+  "skinImage": "https://via.placeholder.com/300",
+  "skinValue": 150.00,
+  "startDate": "2025-11-15T00:00:00.000Z",
+  "endDate": "2025-12-15T23:59:59.000Z"
+}
+###
+
+# Após executar o POST, copie o "id" da resposta e cole abaixo:
+@raffleId = cmi0ma78r000175oc7c1qlqiu
+
+### GET - Listar todos os sorteios - OK
+GET {{baseUrl}}/api/raffles
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+###
+
+### GET - Buscar sorteio específico - OK
+GET {{baseUrl}}/api/raffles/{{raffleId}}
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+###
+### ========================================================================================
+
+
+
+
+
+### ============================================
+### PASSO 3: CRIAR DEPÓSITO
+### ============================================
+
+### POST - Criar depósito - OK
+POST {{baseUrl}}/api/deposits
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+
+{
+  "userId": "{{userId}}",
+  "sponsorId": "{{sponsorId}}",
+  "raffleId": "{{raffleId}}",
+  "amount": 50.00,
+  "proofImage": "https://via.placeholder.com/600/0000FF/FFFFFF?text=Comprovante+PIX"
+}
+###
+
+# Após executar o POST, copie o "id" da resposta e cole abaixo:
+@depositId = cmi0mwoej000375oc5ludtbv7
+
+### GET - Listar os depósitos do usuário - OK
+GET {{baseUrl}}/api/deposits?userId={{userId}}
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+###
+
+### GET - Buscar depósito específico - OK
+GET {{baseUrl}}/api/deposits/{{depositId}}
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+###
+### ========================================================================================
+
+### ============================================
+### PASSO 4: TESTAR APROVAÇÃO
+### ============================================
+
+### PATCH - Aprovar depósito (ADMIN) - OK
+PATCH {{baseUrl}}/api/deposits/{{depositId}}/approve
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+###
+
+### PATCH - Rejeitar depósito (ADMIN) - OK
+PATCH {{baseUrl}}/api/deposits/{{depositId}}/reject
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+###
+### ========================================================================================
+
+### ============================================
+### PASSO 5: TESTAR SORTEIO
+### ============================================
+
+### POST - Realizar sorteio (draw) - OK
+POST {{baseUrl}}/api/raffles/{{raffleId}}/draw
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+### ==========
+### ========================================================================================
+
+### ============================================
+### CONSULTAS (GET)
+### ============================================
+
+### GET - Buscar entradas do usuário em um sorteio
+GET {{baseUrl}}/api/raffles/{{raffleId}}/entries?userId={{userId}}
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+

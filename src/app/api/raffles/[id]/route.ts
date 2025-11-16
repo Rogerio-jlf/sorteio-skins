@@ -1,22 +1,22 @@
-// ============================================
 // src/app/api/raffles/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../lib/prisma";
 
-// GET /api/raffles/[id] - Busca sorteio específico
+// GET /api/raffles/[id] - Busca sorteio por ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> } // 👈 Promise
 ) {
+  // ✅ DESEMPACOTAR PARAMS
+  const { id } = await params;
+
   try {
     const raffle = await prisma.raffle.findUnique({
-      where: { id: params.id },
+      where: { id }, // 👈 Agora funciona
       include: {
         sponsor: true,
         _count: {
-          select: {
-            entries: true,
-          },
+          select: { entries: true },
         },
       },
     });

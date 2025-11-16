@@ -22,3 +22,16 @@ body {
   color: var(--foreground);
   font-family: var(--font-montserrat), sans-serif;
 }
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+.animate-shine {
+  animation: shine 3s infinite;
+}

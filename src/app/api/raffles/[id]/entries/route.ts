@@ -1,46 +1,80 @@
-// ============================================
 // src/app/api/raffles/[id]/entries/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../../../lib/prisma";
 
-// GET /api/raffles/[id]/entries - Lista participações do usuário em um sorteio
+// GET /api/raffles/:id/entries - Lista entries de um sorteio
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> } // ✅ Next.js 15
 ) {
+  // ✅ DESEMPACOTAR PARAMS
+  const { id } = await params;
+
   try {
+    // Obter userId da query string (opcional)
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
 
-    if (!userId) {
+    // Buscar sorteio
+    const raffle = await prisma.raffle.findUnique({
+      where: { id },
+    });
+
+    if (!raffle) {
       return NextResponse.json(
-        { error: "userId é obrigatório" },
-        { status: 400 }
+        { error: "Sorteio não encontrado" },
+        { status: 404 }
       );
     }
 
+    // Filtros para busca
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: any = { raffleId: id };
+    if (userId) {
+      where.userId = userId;
+    }
+
+    // Buscar entries
     const entries = await prisma.raffleEntry.findMany({
-      where: {
-        userId,
-        raffleId: params.id,
-      },
+      where,
       include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
         deposit: {
-          include: {
-            sponsor: true,
+          select: {
+            id: true,
+            amount: true,
+            status: true,
+            createdAt: true,
           },
         },
       },
-      orderBy: {
-        ticketNumber: "asc",
-      },
+      orderBy: { ticketNumber: "asc" }, // ✅ Usando ticketNumber
     });
 
-    return NextResponse.json({ success: true, data: entries });
+    // Contar total
+    const totalEntries = await prisma.raffleEntry.count({
+      where,
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        raffleId: id,
+        raffleTitle: raffle.title,
+        entries,
+        totalEntries,
+      },
+    });
   } catch (error) {
-    console.error("Erro ao buscar participações:", error);
+    console.error("Erro ao buscar entries:", error);
     return NextResponse.json(
-      { error: "Erro ao buscar participações" },
+      { error: "Erro ao buscar entries" },
       { status: 500 }
     );
   }

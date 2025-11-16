@@ -1,14 +1,8 @@
-// ============================================
 // src/app/api/deposits/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../lib/prisma";
-import {
-  calculateQuotas,
-  generateUniqueTicketNumbers,
-} from "../../../lib/utils/ticket-generator";
-import { QUOTA_VALUE } from "../../../lib/constants";
 
-// GET /api/deposits - Lista depósitos do usuário
+// GET /api/deposits?userId=xxx - Lista depósitos de um usuário
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -24,17 +18,21 @@ export async function GET(request: NextRequest) {
     const deposits = await prisma.deposit.findMany({
       where: { userId },
       include: {
-        sponsor: true,
-        raffle: true,
-        entries: {
+        sponsor: {
           select: {
-            ticketNumber: true,
+            name: true,
+            logoUrl: true,
+          },
+        },
+        raffle: {
+          select: {
+            title: true,
+            skinName: true,
+            status: true,
           },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json({ success: true, data: deposits });
@@ -53,7 +51,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { userId, sponsorId, raffleId, amount, proofImage } = body;
 
-    // Validações
+    // Validações básicas
     if (!userId || !sponsorId || !raffleId || !amount || !proofImage) {
       return NextResponse.json(
         { error: "Todos os campos são obrigatórios" },
@@ -61,85 +59,87 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const quotas = calculateQuotas(amount);
-
-    if (quotas === 0) {
+    if (amount <= 0) {
       return NextResponse.json(
-        { error: `O valor mínimo para participar é R$ ${QUOTA_VALUE}` },
+        { error: "Valor deve ser maior que zero" },
         { status: 400 }
       );
     }
 
-    // Verifica se o sorteio existe e está ativo
-    const raffle = await prisma.raffle.findUnique({
-      where: { id: raffleId },
+    // Verificar se o usuário existe
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
     });
 
-    if (!raffle || raffle.status !== "ACTIVE") {
+    if (!user) {
       return NextResponse.json(
-        { error: "Sorteio não encontrado ou não está ativo" },
+        { error: "Usuário não encontrado" },
         { status: 404 }
       );
     }
 
-    // Busca números existentes
-    const existingEntries = await prisma.raffleEntry.findMany({
-      where: { raffleId },
-      select: { ticketNumber: true },
+    // Verificar se o patrocinador existe
+    const sponsor = await prisma.sponsor.findUnique({
+      where: { id: sponsorId },
     });
 
-    const existingNumbers = new Set(
-      existingEntries.map((entry) => entry.ticketNumber)
-    );
-
-    // Gera números únicos
-    const ticketNumbers = generateUniqueTicketNumbers(quotas, existingNumbers);
-
-    if (ticketNumbers.length < quotas) {
+    if (!sponsor) {
       return NextResponse.json(
-        { error: "Não foi possível gerar números únicos suficientes" },
-        { status: 500 }
+        { error: "Patrocinador não encontrado" },
+        { status: 404 }
       );
     }
 
-    // Cria depósito e entries em transação
-    const result = await prisma.$transaction(async (tx) => {
-      const deposit = await tx.deposit.create({
-        data: {
-          userId,
-          sponsorId,
-          raffleId,
-          amount,
-          quotas,
-          proofImage,
-          status: "PENDING",
-        },
-      });
-
-      const entries = await tx.raffleEntry.createMany({
-        data: ticketNumbers.map((ticketNumber) => ({
-          userId,
-          raffleId,
-          depositId: deposit.id,
-          ticketNumber,
-        })),
-      });
-
-      return { deposit, entriesCount: entries.count };
+    // Verificar se o sorteio existe e está ativo
+    const raffle = await prisma.raffle.findUnique({
+      where: { id: raffleId },
     });
 
-    return NextResponse.json({
-      success: true,
+    if (!raffle) {
+      return NextResponse.json(
+        { error: "Sorteio não encontrado" },
+        { status: 404 }
+      );
+    }
+
+    if (raffle.status !== "ACTIVE") {
+      return NextResponse.json(
+        { error: "Sorteio não está ativo" },
+        { status: 400 }
+      );
+    }
+
+    // Calcular número de quotas (exemplo: R$10 = 1 quota)
+    const quotas = Math.floor(amount / 10);
+
+    if (quotas === 0) {
+      return NextResponse.json(
+        { error: "Valor mínimo é R$10 para 1 quota" },
+        { status: 400 }
+      );
+    }
+
+    const deposit = await prisma.deposit.create({
       data: {
-        depositId: result.deposit.id,
+        userId,
+        sponsorId,
+        raffleId,
+        amount,
         quotas,
-        ticketNumbers,
+        proofImage,
+        status: "PENDING",
+      },
+      include: {
+        sponsor: true,
+        raffle: true,
       },
     });
+
+    return NextResponse.json({ success: true, data: deposit }, { status: 201 });
   } catch (error) {
     console.error("Erro ao criar depósito:", error);
     return NextResponse.json(
-      { error: "Erro ao processar depósito" },
+      { error: "Erro ao criar depósito" },
       { status: 500 }
     );
   }

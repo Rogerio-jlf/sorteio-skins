@@ -6,7 +6,7 @@
 
 type RequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
-  body?: any;
+  body?: unknown;
   headers?: Record<string, string>;
 };
 
