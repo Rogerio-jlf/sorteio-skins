@@ -19,14 +19,12 @@ const signInSchemaZod = z.object({
 });
 
 type SignInFormData = z.infer<typeof signInSchemaZod>;
-// ====================
 
 interface SignInFormProps {
   isOpenLoginForm: boolean;
   onCloseLoginForm: () => void;
   onRegisterNow: () => void;
 }
-// ====================
 
 export function LoginForm({
   isOpenLoginForm,
@@ -49,6 +47,8 @@ export function LoginForm({
   const [passwordValue, setPasswordValue] = useState("");
   const [passwordFocused, setPasswordFocused] = useState(false);
 
+  const router = useRouter();
+
   // Função para limpar o formulário
   const clearForm = () => {
     setEmailValue("");
@@ -59,14 +59,12 @@ export function LoginForm({
     setFieldValid({});
     setIsLoading(false);
   };
-  // ====================
 
   // Função para fechar e limpar o formulário
   const handleClose = () => {
     clearForm();
     onCloseLoginForm();
   };
-  // ====================
 
   // Valida campo individual ao sair (onBlur)
   const handleFieldBlur = (fieldName: keyof SignInFormData, value: string) => {
@@ -87,9 +85,6 @@ export function LoginForm({
       setFieldErrors((prev) => ({ ...prev, [fieldName]: errorMessage }));
     }
   };
-  // ====================
-
-  const router = useRouter();
 
   // Função Submit
   const handleSubmit = async (e?: React.MouseEvent<HTMLButtonElement>) => {
@@ -119,6 +114,7 @@ export function LoginForm({
     setIsLoading(true);
 
     try {
+      // 1. Fazer login
       const res = await signIn.email({
         email: validation.data.email,
         password: validation.data.password,
@@ -127,10 +123,41 @@ export function LoginForm({
       if (res.error) {
         setError(res.error.message || "Algo deu errado.");
         setIsLoading(false);
-      } else {
+        return;
+      }
+
+      // 2. ✅ Verificar se é ADMIN após login bem-sucedido
+      try {
+        const meResponse = await fetch("/api/auth/me");
+        const meData = await meResponse.json();
+
+        if (meData.success && meData.user) {
+          clearForm();
+          onCloseLoginForm();
+
+          // 3. Redirecionar baseado na role
+          if (meData.user.isAdmin) {
+            console.log(
+              "✅ Admin detectado, redirecionando para /paginas/admin"
+            );
+            router.push("/paginas/admin");
+          } else {
+            console.log(
+              "✅ Usuário comum, redirecionando para /paginas/dashboard"
+            );
+            router.push("/paginas/dashboard");
+          }
+        } else {
+          // Se não conseguir pegar os dados do usuário, redireciona para dashboard
+          clearForm();
+          onCloseLoginForm();
+          router.push("/paginas/dashboard");
+        }
+      } catch (meError) {
+        console.error("Erro ao verificar role do usuário:", meError);
+        // Em caso de erro, redireciona para dashboard por padrão
         clearForm();
         onCloseLoginForm();
-
         router.push("/paginas/dashboard");
       }
     } catch (err) {
@@ -139,14 +166,9 @@ export function LoginForm({
       setIsLoading(false);
     }
   };
-  // ====================
 
   if (!isOpenLoginForm) return null;
-  // ====================
 
-  // ====================================================================================================
-  // RENDERIZAÇÃO DO COMPONENTE
-  // ====================================================================================================
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
       <div className="w-full max-w-md relative">
@@ -157,7 +179,6 @@ export function LoginForm({
         >
           <X className="w-6 h-6 text-white" />
         </button>
-        {/* ===== */}
 
         {/* Card do formulário */}
         <div className="bg-linear-to-br from-white/15 via-white/10 to-white/5 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 p-8 flex flex-col gap-6 relative overflow-hidden">
@@ -187,7 +208,6 @@ export function LoginForm({
               </p>
             </div>
           </header>
-          {/* ===== */}
 
           {/* Badge Site Seguro */}
           <div className="flex justify-center">
@@ -198,7 +218,6 @@ export function LoginForm({
               </span>
             </div>
           </div>
-          {/* ===== */}
 
           {/* Mensagem de erro */}
           {error && (
@@ -208,7 +227,6 @@ export function LoginForm({
               </p>
             </div>
           )}
-          {/* ===== */}
 
           {/* Formulário */}
           <form className="flex flex-col gap-6">
@@ -380,7 +398,6 @@ export function LoginForm({
               </span>
             </button>
           </form>
-          {/* ===== */}
 
           {/* Divider */}
           <div className="flex items-center gap-3">
@@ -390,7 +407,6 @@ export function LoginForm({
             </span>
             <div className="flex-1 h-px bg-linear-to-l from-transparent via-white/20 to-white/20"></div>
           </div>
-          {/* ===== */}
 
           {/* Link para cadastro */}
           <div className="text-center">
@@ -404,7 +420,6 @@ export function LoginForm({
               </button>
             </p>
           </div>
-          {/* ===== */}
         </div>
       </div>
     </div>

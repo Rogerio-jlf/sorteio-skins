@@ -3,39 +3,19 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "../../../lib/prisma";
 import { requireAdmin } from "../../../lib/auth-middleware";
 
-// GET /api/sponsors - Lista todos os patrocinadores
-export async function GET() {
-  try {
-    const sponsors = await prisma.sponsor.findMany({
-      where: { isActive: true },
-      orderBy: { createdAt: "desc" },
-    });
-
-    return NextResponse.json({ success: true, data: sponsors });
-  } catch (error) {
-    console.error("Erro ao buscar patrocinadores:", error);
-    return NextResponse.json(
-      { error: "Erro ao buscar patrocinadores" },
-      { status: 500 }
-    );
-  }
-}
-
-// POST /api/sponsors - Cria novo patrocinador (admin)
+// CRIAR PATROCINADOR
 export async function POST(request: NextRequest) {
   // ✅ VERIFICAR SE É ADMIN
   const authResult = await requireAdmin(request);
 
   if (authResult instanceof NextResponse) {
-    return authResult; // Retorna erro de autenticação/autorização
+    return authResult;
   }
 
   const { user } = authResult;
   console.log(`Admin ${user.email} criando patrocinador`);
 
   try {
-    // TODO: Adicionar verificação de permissão de admin aqui
-
     const body = await request.json();
     const { name, slug, couponCode, logoUrl, isActive } = body;
 
@@ -86,6 +66,24 @@ export async function POST(request: NextRequest) {
     console.error("Erro ao criar patrocinador:", error);
     return NextResponse.json(
       { error: "Erro ao criar patrocinador" },
+      { status: 500 }
+    );
+  }
+}
+
+// LISTAR TODOS OS PATROCINADORES
+export async function GET() {
+  try {
+    const sponsors = await prisma.sponsor.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json({ success: true, data: sponsors });
+  } catch (error) {
+    console.error("Erro ao buscar patrocinadores:", error);
+    return NextResponse.json(
+      { error: "Erro ao buscar patrocinadores" },
       { status: 500 }
     );
   }

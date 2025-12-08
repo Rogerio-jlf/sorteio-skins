@@ -153,8 +153,12 @@ export default async function DashboardPage() {
             <CardHeader>
               <CardTitle className="text-white flex items-center justify-between">
                 <span>Sorteios Ativos</span>
-                <Link href="/raffles">
-                  <Button variant="ghost" size="sm" className="text-blue-400">
+                <Link href="/paginas/raffles">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-blue-400 cursor-pointer"
+                  >
                     Ver todos
                   </Button>
                 </Link>
@@ -186,10 +190,10 @@ export default async function DashboardPage() {
                         <span>{raffle._count.entries} participações</span>
                       </div>
                     </div>
-                    <Link href={`/raffles/${raffle.id}`}>
+                    <Link href={`/paginas/raffles/${raffle.id}`}>
                       <Button
                         size="sm"
-                        className="bg-blue-600 hover:bg-blue-700"
+                        className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
                       >
                         Participar
                       </Button>
@@ -205,8 +209,12 @@ export default async function DashboardPage() {
             <CardHeader>
               <CardTitle className="text-white flex items-center justify-between">
                 <span>Últimos Depósitos</span>
-                <Link href="/deposits">
-                  <Button variant="ghost" size="sm" className="text-blue-400">
+                <Link href="/paginas/deposits">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-blue-400 cursor-pointer"
+                  >
                     Ver todos
                   </Button>
                 </Link>

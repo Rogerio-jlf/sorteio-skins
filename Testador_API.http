@@ -3,8 +3,9 @@
 ### ============================================
 @baseUrl = http://localhost:3000
 @contentType = application/json
-@userId = Bnr6l93HzkTpwXlb2xAhAe2N1h29jWgD
-@sessionToken = P9WM5FssjgIRLSlSCLJqjbNEVfkgjdGH.UZcaFs3odwMUeXcIZhirbQasPeFmygo%2Bqjk8x60j6VY%3D
+# @userId = Bnr6l93HzkTpwXlb2xAhAe2N1h29jWgD esse é o ID do Rogério
+@userId = IFvTaXaQxlc54KfyA97dlbUj7CvPtjfR
+@sessionToken = mZoMAASixpOsPGixoLR0EJe2RZ8cCsQB.%2Fk7EQ%2Bmu%2BF11aOd2rEi9KMJKSyWEj8p0%2BS2IIzcYgc0%3D
 
 ### ============================================
 ### TESTE DE AUTENTICAÇÃO
@@ -12,6 +13,22 @@
 
 ### GET - Verificar usuário logado e role - OK
 GET {{baseUrl}}/api/auth/me
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+### ========================================================================================
+
+### ============================================
+### USUÁRIOS
+### ============================================
+
+### GET - BUSCAR TODOS OS USUÁRIO
+GET {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+Cookie: better-auth.session_token={{sessionToken}}
+### ===
+
+### GET - BUSCAR USUÁRIO ESPECÍFICO
+GET {{baseUrl}}/api/users/{{userId}}
 Content-Type: {{contentType}}
 Cookie: better-auth.session_token={{sessionToken}}
 ### ========================================================================================
@@ -24,31 +41,33 @@ Cookie: better-auth.session_token={{sessionToken}}
 ### PASSO 1: CRIAR PATROCINADOR
 ### ============================================
 
-### POST - Criar patrocinador -OK
+### POST - Criar patrocinador
 POST {{baseUrl}}/api/sponsors
 Content-Type: {{contentType}}
 Cookie: better-auth.session_token={{sessionToken}}
 
 {
-  "name": "GG.Bet",
-  "slug": "ggbet",
-  "couponCode": "PROMO2025",
-  "logoUrl": "https://via.placeholder.com/150",
+  "name": "Nesha Store",
+  "slug": "nesha-store",
+  "couponCode": "TARUHNESHASTORE10",
+  "logoUrl": "/logotipo-nesha-store-1.jpg",
   "isActive": true
 }
-###
+### =====
 
 # Após executar o POST, copie o "id" da resposta e cole abaixo:
 @sponsorId = cmi0h91gk0000759gfm2jfxt4
+# @sponsorId = cmiuw1n42000075zoz9gvgxh2 - esse ID é da Nesha Store
+# @sponsorId = cmi0h91gk0000759gfm2jfxt4 - esse ID é do Skins Monkey
 
-### GET - Listar todos os patrocinadores - OK
+### GET - Listar todos os patrocinadores
 GET {{baseUrl}}/api/sponsors
 Content-Type: {{contentType}}
 Cookie: better-auth.session_token={{sessionToken}}
 ###
 
-### GET - Buscar patrocinador específico pelo slug - OK
-GET {{baseUrl}}/api/sponsors/ggbet
+### GET - Buscar patrocinador específico pelo slug
+GET {{baseUrl}}/api/sponsors/skins-monkey
 Content-Type: {{contentType}}
 Cookie: better-auth.session_token={{sessionToken}}
 ###
@@ -62,7 +81,7 @@ Cookie: better-auth.session_token={{sessionToken}}
 ### PASSO 2: CRIAR SORTEIO
 ### ============================================
 
-### POST - Criar sorteio - OK
+### POST - Criar sorteio
 POST {{baseUrl}}/api/raffles
 Content-Type: {{contentType}}
 Cookie: better-auth.session_token={{sessionToken}}
@@ -82,7 +101,7 @@ Cookie: better-auth.session_token={{sessionToken}}
 # Após executar o POST, copie o "id" da resposta e cole abaixo:
 @raffleId = cmi0ma78r000175oc7c1qlqiu
 
-### GET - Listar todos os sorteios - OK
+### GET - Listar todos os sorteios ativos
 GET {{baseUrl}}/api/raffles
 Content-Type: {{contentType}}
 Cookie: better-auth.session_token={{sessionToken}}
@@ -103,7 +122,7 @@ Cookie: better-auth.session_token={{sessionToken}}
 ### PASSO 3: CRIAR DEPÓSITO
 ### ============================================
 
-### POST - Criar depósito - OK
+### POST - Criar depósito
 POST {{baseUrl}}/api/deposits
 Content-Type: {{contentType}}
 Cookie: better-auth.session_token={{sessionToken}}
@@ -112,13 +131,13 @@ Cookie: better-auth.session_token={{sessionToken}}
   "userId": "{{userId}}",
   "sponsorId": "{{sponsorId}}",
   "raffleId": "{{raffleId}}",
-  "amount": 50.00,
+  "amount": 150.00,
   "proofImage": "https://via.placeholder.com/600/0000FF/FFFFFF?text=Comprovante+PIX"
 }
 ###
 
 # Após executar o POST, copie o "id" da resposta e cole abaixo:
-@depositId = cmi0mwoej000375oc5ludtbv7
+@depositId = cmixm1bjk00017534b7t8sq1c
 
 ### GET - Listar os depósitos do usuário - OK
 GET {{baseUrl}}/api/deposits?userId={{userId}}

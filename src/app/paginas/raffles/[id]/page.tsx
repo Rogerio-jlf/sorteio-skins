@@ -1,8 +1,8 @@
 // src/app/raffles/[id]/page.tsx
-import { auth } from "../../../lib/auth";
+import { auth } from "../../../../lib/auth";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import prisma from "../../../lib/prisma";
+import prisma from "../../../../lib/prisma";
 import type { RaffleEntry, Deposit } from "@prisma/client";
 import {
   Card,
@@ -19,21 +19,24 @@ import {
   formatCurrency,
   formatDate,
   getTimeRemaining,
-} from "../../../lib/utils/format";
+} from "../../../../lib/utils/format";
 import { Trophy, Users, Clock, ArrowLeft, Ticket } from "lucide-react";
-import DepositForm from "../../../components/deposit-form";
+import DepositForm from "../../../../components/deposit-form";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>; // ← params agora é uma Promise
 }
 
 export default async function RaffleDetailPage({ params }: PageProps) {
+  // ← CORREÇÃO: await params antes de usar
+  const { id } = await params;
+
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   const raffle = await prisma.raffle.findUnique({
-    where: { id: params.id },
+    where: { id }, // ← agora usando o id desembrulhado
     include: {
       sponsor: true,
       _count: {
@@ -45,6 +48,7 @@ export default async function RaffleDetailPage({ params }: PageProps) {
   if (!raffle) {
     notFound();
   }
+
   // Buscar participações do usuário neste sorteio
   let userEntries: (RaffleEntry & { deposit: Deposit | null })[] = [];
   if (session) {
@@ -70,7 +74,7 @@ export default async function RaffleDetailPage({ params }: PageProps) {
     <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-gray-900">
       <div className="container mx-auto px-4 py-8">
         {/* Botão Voltar */}
-        <Link href="/raffles">
+        <Link href="/paginas/raffles">
           <Button
             variant="ghost"
             className="text-gray-400 hover:text-white mb-6"
