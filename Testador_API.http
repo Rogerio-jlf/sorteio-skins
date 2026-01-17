@@ -4,8 +4,9 @@
 @baseUrl = http://localhost:3000
 @contentType = application/json
 # @userId = Bnr6l93HzkTpwXlb2xAhAe2N1h29jWgD esse é o ID do Rogério
-@userId = IFvTaXaQxlc54KfyA97dlbUj7CvPtjfR
-@sessionToken = mZoMAASixpOsPGixoLR0EJe2RZ8cCsQB.%2Fk7EQ%2Bmu%2BF11aOd2rEi9KMJKSyWEj8p0%2BS2IIzcYgc0%3D
+# @userId = IFvTaXaQxlc54KfyA97dlbUj7CvPtjfR esse é o ID do Rafael
+@userId = Bnr6l93HzkTpwXlb2xAhAe2N1h29jWgD
+@sessionToken = 3YNW2ZwQ0i7knsv1kZlyoVvHipiXqkNK.URvpthv7DAQMjmx%2F%2F40vjuzQBNkQRlqK4NcvPcjXzyg%3D
 
 ### ============================================
 ### TESTE DE AUTENTICAÇÃO
@@ -57,8 +58,10 @@ Cookie: better-auth.session_token={{sessionToken}}
 
 # Após executar o POST, copie o "id" da resposta e cole abaixo:
 @sponsorId = cmi0h91gk0000759gfm2jfxt4
+@sponsorSlug = csgo-net
+# @sponsorId = cmi0h91gk0000759gfm2jfxt4 - esse ID é da CSGO.Net
 # @sponsorId = cmiuw1n42000075zoz9gvgxh2 - esse ID é da Nesha Store
-# @sponsorId = cmi0h91gk0000759gfm2jfxt4 - esse ID é do Skins Monkey
+# @sponsorId = cmixhrb0500007538ifviwrq5 - esse ID é da Skins monkey
 
 ### GET - Listar todos os patrocinadores
 GET {{baseUrl}}/api/sponsors
@@ -67,9 +70,8 @@ Cookie: better-auth.session_token={{sessionToken}}
 ###
 
 ### GET - Buscar patrocinador específico pelo slug
-GET {{baseUrl}}/api/sponsors/skins-monkey
+GET {{baseUrl}}/api/sponsors/by-slug/{{sponsorSlug}}
 Content-Type: {{contentType}}
-Cookie: better-auth.session_token={{sessionToken}}
 ###
 ### ========================================================================================
 
@@ -93,13 +95,13 @@ Cookie: better-auth.session_token={{sessionToken}}
   "skinName": "AK-47 Redline Field-Tested",
   "skinImage": "https://via.placeholder.com/300",
   "skinValue": 150.00,
-  "startDate": "2025-11-15T00:00:00.000Z",
-  "endDate": "2025-12-15T23:59:59.000Z"
+  "startDate": "2026-01-15T00:00:00.000Z",
+  "endDate": "2026-02-15T23:59:59.000Z"
 }
 ###
 
 # Após executar o POST, copie o "id" da resposta e cole abaixo:
-@raffleId = cmi0ma78r000175oc7c1qlqiu
+@raffleId = cmkifs8q5000275k4eiux4ayg
 
 ### GET - Listar todos os sorteios ativos
 GET {{baseUrl}}/api/raffles
